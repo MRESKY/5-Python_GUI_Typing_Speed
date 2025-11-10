@@ -1,0 +1,3 @@
+# GUI (tkinter is built-in with Python)
+# tkinter - built-in
+tkinter>=8.6
