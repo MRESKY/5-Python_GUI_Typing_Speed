@@ -1,5 +1,5 @@
 from typing import Dict, Tuple, Final
-from contracts.i_config import IConfig
+from gui.contracts.i_config import IConfig
 
 
 class AppConfig(IConfig):

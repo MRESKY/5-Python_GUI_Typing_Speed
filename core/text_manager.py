@@ -1,8 +1,8 @@
 import random
-from .contracts.i_text_manager import TextManager as ITextManager
+from core.contracts.i_text_manager import iTextManager
 
 
-class TextManager(ITextManager):
+class TextManager(iTextManager):
     def __init__(self, texts=None):
         if texts is None:
             texts = []

@@ -1,12 +1,4 @@
-try:
-    from .contracts.i_calculator import iCalculator
-except ImportError:
-    from abc import ABC, abstractmethod
-    class iCalculator(ABC):
-        @staticmethod
-        @abstractmethod
-        def calculate_wpm(correct_chars, total_words: int, time_minutes: float) -> tuple:
-            pass
+from core.contracts.i_calculator import iCalculator
 
 class Calculator(iCalculator):
     @staticmethod
