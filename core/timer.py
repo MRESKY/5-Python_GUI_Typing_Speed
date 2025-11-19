@@ -17,7 +17,7 @@ import os
 
 # Import
 from typing import Callable, Optional
-from core.contracts.i_timer import iTimer
+from contracts.i_timer import iTimer
 
 # Adjust sys.path to include project root for imports
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -37,7 +37,7 @@ class Timer(iTimer):
         self._timer_thread = None
         self._stop_event = threading.Event()
 
-    def start(self) -> None:
+    def start_timer(self) -> None:
         """Start the timer"""
         if self.is_running:
             return
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     timer = Timer(duration=5, callback=on_time_update)
     
     print("Starting 5-second timer...")
-    timer.start()
+    timer.start_timer()
     
     # Let it run for a bit
     time.sleep(6)
