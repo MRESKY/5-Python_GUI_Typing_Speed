@@ -17,6 +17,7 @@ class AppConfig(IConfig):
         self._theme = theme
         self.colors = self._load_colors(theme)
         self.fonts = self._load_fonts()
+        self.APP_NAME: Final[str] = "Typing Speed Test"
 
     def _load_colors(self, theme: str) -> Dict[str, str]:
         if theme == "dark":

@@ -95,3 +95,6 @@ Thumbs.db
 staticfiles/
 media/
 __static__/
+
+# Best practice module
+best_practice
