@@ -88,6 +88,26 @@ class TextManager(iTextManager):
         """
         return self.difficulty_level
     
+    
+    def get_text_by_difficulty(self, difficulty: str) -> str:
+        """
+        Get random text by specific difficulty level
+        
+        Args:
+            difficulty: Difficulty level (easy, medium, hard, programming)
+            
+        Returns:
+            str: Random text of specified difficulty
+        """
+        if difficulty not in self.default_texts:
+            difficulty = "medium"
+            
+        texts = self.default_texts[difficulty]
+        text = random.choice(texts)
+        self.current_text = text
+        return self._format_text(text)
+    
+    
     def get_available_difficulty_levels(self) -> List[str]:
         """
         Get the list of available difficulty levels
@@ -194,27 +214,93 @@ class TextManager(iTextManager):
             segments.append(self._formated_text(current_segment))
 
         return segments
-
-    def compare_texts(self, user_input):
-        correct_characters = 0
-        for x, y in zip(user_input.lower(), self.current_text.lower()):
-            if x == y:
-                correct_characters += 1
-        return correct_characters, len(user_input)
     
+    def get_text_statistics(self, text: str = None) -> dict:
+        """
+        Get statistics of the given text or current text
+        
+        Args:
+            text: Optional text to analyze. If None, uses current_text.
+        
+        Returns:
+            dict: Statistics including character count and word count
+        """
+        if text is None:
+            text = self.current_text
 
+        if not text:
+            return {}
+        
+        # Calculate word count(including spaces)
+        words = text.split()
+        total_characters = len(words)
 
+        # Calculate character count (excluding spaces)
+        chars_no_spaces = len(text.replace(" ", ""))
+
+        # Calculate word count (including spaces)
+        word_count = len(text.split())
+
+        # count sentences
+        sentences = re.split(r'[.!?]+', text)
+        sentence_count = len([s for s in sentences if s.strip()])
+
+        # Average word length
+        avg_word_length = sum(len(word) for word in words) / word_count if word_count > 0 else 0
+
+        # Estimated difificulty level based on average word length
+        if avg_word_length < 4:
+            estimated_difficulty = "easy"
+        elif avg_word_length < 6:
+            estimated_difficulty = "medium"
+        else:
+            estimated_difficulty = "hard"
+
+        return {"total_characters": total_characters, "chars_no_spaces": chars_no_spaces, "word_count": word_count, "sentence_count": sentence_count, "avg_word_length": avg_word_length, "estimated_difficulty": estimated_difficulty}
+
+    def get_all_texts(self) -> dict:
+        """
+        Get all available texts organized by source
+        
+        Returns:
+            dict: All texts organized by source and difficulty
+        """
+        return {
+            "default": self.default_texts,
+            "custom": self.custom_texts
+        }
+
+    def clear_custom_texts(self) -> None:
+        """Clear all custom texts"""
+        self.custom_texts.clear()
+
+    def get_text_count(self) -> dict:
+        """
+        Get count of texts by category
+        
+        Returns:
+            dict: Text counts by category
+        """
+        counts = {"custom": len(self.custom_texts)}
+        
+        for difficulty, texts in self.default_texts.items():
+            counts[difficulty] = len(texts)
+            
+        return counts
+    
 if __name__ == "__main__":
-    texts = [
-        "The quick brown fox jumps over the lazy dog.",
-        "Pack my box with five dozen liquor jugs.",
-        "How vexingly quick daft zebras jump!"
-    ]
+    # texts = [
+    #     "The quick brown fox jumps over the lazy dog.",
+    #     "Pack my box with five dozen liquor jugs.",
+    #     "How vexingly quick daft zebras jump!"
+    # ]
     
-    manager = TextManager(texts)
-    random_text = manager.get_random_text()
-    print("Random Text:", random_text)
+    # manager = TextManager(texts)
+    # random_text = manager.get_random_text()
+    # print("Random Text:", random_text)
     
-    user_input = input("Type the above text: ")
-    correct, total = manager.compare_texts(user_input)
-    print(f"Correct Characters: {correct} out of {total}")
+    # user_input = input("Type the above text: ")
+    # correct, total = manager.compare_texts(user_input)
+    # print(f"Correct Characters: {correct} out of {total}")
+
+    print(dir(TextManager))
