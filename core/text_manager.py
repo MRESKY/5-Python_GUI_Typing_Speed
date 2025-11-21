@@ -137,6 +137,63 @@ class TextManager(iTextManager):
             text += '.'
         
         return text
+    
+    def load_texts_from_file(self, file_path: str) -> bool:
+        """
+        Load texts from a file, one text per line
+        
+        Args:
+            file_path: Path to the text file
+        Returns:
+            bool: True if texts were loaded successfully
+        """
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                lines = file.read()
+
+            texts = self._split_text_into_segments(lines)
+
+            for text in texts:
+                self.add_costum_text(text)
+
+            return len(texts) > 0
+
+        except Exception as e:
+            print(f"Error loading texts from file: {e}")
+            return False
+    
+    def _split_text_into_segments(self, content: str) -> List[str]:
+        """Split large text into smaller segments based on punctuation
+        
+        Args:
+            content: Large block of text
+            
+        Returns:
+            List[str]: List of text segments
+        """
+        # Split by sentence-ending punctuation followed by space/newline
+        sentences = re.split(r'(?<=[.!?])\s+', content)
+        segments = []
+        
+        current_segment = ""
+        max_length = 200  # Max length for each segment
+
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if not sentence:
+                continue
+
+            if current_segment and len(current_segment+" "+sentence) > max_length:
+                segments.append(self._formated_text(current_segment))
+                current_segment = sentence
+            else:
+                current_segment += " " + sentence if current_segment else sentence
+
+        if current_segment:
+            segments.append(self._formated_text(current_segment))
+
+        return segments
 
     def compare_texts(self, user_input):
         correct_characters = 0
@@ -144,6 +201,8 @@ class TextManager(iTextManager):
             if x == y:
                 correct_characters += 1
         return correct_characters, len(user_input)
+    
+
 
 if __name__ == "__main__":
     texts = [
