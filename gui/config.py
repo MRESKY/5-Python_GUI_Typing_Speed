@@ -8,10 +8,11 @@ class AppConfig(IConfig):
     DEFAULT_FONT_SIZE: Final[int] = 12
     DEFAULT_SIZE: Final[Tuple[int, int]] = (400, 400)
     DEFAULT_SIZE_WINDOW: Final[Dict[str, Tuple[int, int]]] = {
-            'small': (100, 100),
+            'small': (300, 300),
             'medium': (400, 400),
             'large': (800, 800)
         }
+    MIN_SIZE: Final[Tuple[int, int]] = (300, 300)
 
     def __init__(self, theme: str = "light"):
         self._theme = theme

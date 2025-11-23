@@ -24,101 +24,87 @@ class MenuBar(tk.Menu):
         self.create_menus()
 
     def create_menus(self):
+        """Create the menu bar with File and Help menus"""
         # File Menu
         file_menu = tk.Menu(self, tearoff=0)
-        file_menu.add_command(label="New Test", command=self.callbacks.get('new_file', self.default_new_file))
-        file_menu.add_command(label="Load Text", command=self.callbacks.get('open_file', self.default_open_file))
+        file_menu.add_command(label="New Test", accelerator="Ctrl+N", 
+                              command=self.callbacks.get('new_file', self.deafult_new_file))
+        file_menu.add_command(label="Load Text", accelerator="Ctrl+O",
+                              command=self.callbacks.get('load_file', self.default_load_file))
         file_menu.add_separator()
-        file_menu.add_command(label="Save Results", command=self.callbacks.get('save_results', self.default_save))
+        file_menu.add_command(label="Save Results", accelerator="Ctrl+S",
+                              command=self.callbacks.get('save_file', self.default_save_file))
+        file_menu.add_command(label="Export Config",
+                              command=self.callbacks.get('export_config', self.default_export_config))
         file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.callbacks.get('exit_app', self.default_exit))
+        file_menu.add_command(label="Exit", accelerator="Ctrl+Q",
+                                command=self.callbacks.get('exit_app', self.default_exit_app))
         self.add_cascade(label="File", menu=file_menu)
 
-        # Settings Menu
+        # Setting Menu
         settings_menu = tk.Menu(self, tearoff=0)
-        settings_menu.add_command(label="Preferences", command=self.callbacks.get('open_preferences', self.default_preferences))
-        settings_menu.add_command(label="Themes", command=self.callbacks.get('change_theme', self.default_themes))
+        settings_menu.add_command(label="Preferences",
+                                  command=self.callbacks.get('open_settings', self.default_open_settings))
+        
+        # Theme Submenu
+        theme_menu = tk.Menu(settings_menu, tearoff=0)
+        theme_menu.add_command(label="Dark Theme", 
+                                   command=lambda: self.callbacks.get('change_theme',lambda: None)('dark'))
+        theme_menu.add_command(label="Light Theme",
+                                   command=lambda: self.callbacks.get('change_theme',lambda: None)('light'))
+        settings_menu.add_cascade(label="Theme", menu=theme_menu)
+        self.add_cascade(label="Theme", menu=settings_menu)
+
+        # Difficulty Submenu
+        difficulty_menu = tk.Menu(settings_menu, tearoff=0)
+        difficulty_menu.add_command(label="Easy",
+                                        command=lambda: self.callbacks.get('change_difficulty',lambda: None)('easy'))
+        difficulty_menu.add_command(label="Medium",
+                                        command=lambda: self.callbacks.get('change_difficulty',lambda: None)('medium'))
+        difficulty_menu.add_command(label="Hard",
+                                        command=lambda: self.callbacks.get('change_difficulty',lambda: None)('hard'))
+        difficulty_menu.add_command(label="Programming",
+                                        command=lambda: self.callbacks.get('change_difficulty',lambda: None)('programming'))
+        settings_menu.add_cascade(label="Difficulty", menu=difficulty_menu)
+
         self.add_cascade(label="Settings", menu=settings_menu)
 
         # Help Menu
         help_menu = tk.Menu(self, tearoff=0)
-        help_menu.add_command(label="About", command=self.callbacks.get('show_about', self.default_about))
+        help_menu.add_command(label="Instructions", accelerator="F1",
+                              command=self.callbacks.get('show_instructions', self.default_show_instructions))
+        help_menu.add_command(label="Statistics",
+                              command=self.callbacks.get('show_statistics', self.default_show_statistics))
+        help_menu.add_separator()
+        help_menu.add_command(label="About",
+                              command=self.callbacks.get('show_about', self.default_show_about))
         self.add_cascade(label="Help", menu=help_menu)
 
-    def default_new_file(self):
-        messagebox.showinfo("New", "New file functionality not implemented")
-
-    def default_open_file(self):
-        messagebox.showinfo("Open", "Open file functionality not implemented")
+    def deafult_new_file(self):
+        messagebox.showinfo("New Test", "New Test action triggered.")
+    def default_load_file(self):
+        messagebox.showinfo("Load Text", "Load Text action triggered.")
+    def default_save_file(self):
+        messagebox.showinfo("Save Results", "Save Results action triggered.")
+    def default_export_config(self):
+        messagebox.showinfo("Export Config", "Export Config action triggered.")
+    def default_exit_app(self):
+        messagebox.showinfo("Exit", "Exit action triggered.")
+    def default_open_settings(self):
+        messagebox.showinfo("Preferences", "Preferences action triggered.")
+    def default_show_instructions(self):
+        messagebox.showinfo("Instructions", "Instructions action triggered.")
+    def default_show_statistics(self):
+        messagebox.showinfo("Statistics", "Statistics action triggered.")
+    def default_show_about(self):
+        messagebox.showinfo("About", "About action triggered.")
     
-    def default_save(self):
-        messagebox.showinfo("Save", "Save functionality not implemented")
-    
-    def default_preferences(self):
-        messagebox.showinfo("Preferences", "Preferences functionality not implemented")
-    
-    def default_themes(self):
-        messagebox.showinfo("Themes", "Themes functionality not implemented")
 
-    def default_exit(self):
-        self.master.quit()
-
-    def default_about(self):
-        messagebox.showinfo("About", "Typing Speed Test v1.0")
-
-class BaseWindow(tk.Tk):
-    def __init__(self, config: AppConfig = None, menu_bar: MenuBar = None, dependencies: dict = None):
+class BaseWindow(tk.Tk, iMainWindow):
+    def __init__(self, config: AppConfig = None, menu_bar: MenuBar = None, dependencies: Dict = None):
         super().__init__()
-
         self.app_config = config or AppConfig()
         self.dependencies = dependencies or {}
-        
 
-        self.geometry(f'{self.app_config.DEFAULT_SIZE[0]}x{self.app_config.DEFAULT_SIZE[1]}')
-        self.title(self.app_config.APP_NAME)
-
-        if menu_bar:
-            self.menu_bar = menu_bar
-        else:
-            menu_callbacks = {
-                'new_file': self.dependencies.get('new_file_callback'),
-                'open_file': self.dependencies.get('open_file_callback'),
-                'save_results': self.dependencies.get('save_results_callback'),
-                'exit_app': self.dependencies.get('exit_app_callback'),
-                'open_preferences': self.dependencies.get('open_preferences_callback'),
-                'change_theme': self.dependencies.get('change_theme_callback'),
-                'show_about': self.dependencies.get('show_about_callback')
-            }
-            self.menu_bar = MenuBar(master=self, callbacks=menu_callbacks)
-        
-        self.config(menu=self.menu_bar)
-
-class MainWindow(BaseWindow, iMainWindow):
-    def __init__(self, config: AppConfig = None, calculator: Calculator = None, text_manager: TextManager = None, timer: Timer = None):
-        super().__init__(config=config)
-        self.calculator = calculator
-        self.text_manager = text_manager
-        self.timer = timer
-
-    def setup_ui(self) -> None:
-        self.title("Typing Speed Test")
-        self.configure(bg=self.app_config.get_color('background'))
-
-    def update_wpm_display(self, wpm: float) -> None:
-        pass
-    def update_accuracy_display(self, accuracy: float) -> None:
-        pass
-    def show_time_remaining(self, time_seconds: float) -> None:
-        pass
-
-if __name__ == "__main__":
-    texts = [
-        "The quick brown fox jumps over the lazy dog.",
-        "Pack my box with five dozen liquor jugs.",
-        "How vexingly quick daft zebras jump!"
-    ]
-
-    app_config = AppConfig(theme="dark")
-    app = MainWindow(config=app_config, calculator=Calculator(), text_manager=TextManager(texts=texts), timer=Timer())
-    app.setup_ui()
-    app.mainloop()
+        # Set window properties
+        self.geometry(f'{self.app_config.DEFAULT_SIZE_WINDOW("large")[0]}x{self.app_config.DEFAULT_SIZE_WINDOW("large")[1]}')
