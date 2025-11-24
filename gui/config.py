@@ -1,71 +1,152 @@
-from typing import Dict, Tuple, Final
-from gui.contracts.i_config import IConfig
+import json
+import os
+from typing import Dict, Any
 
+try:
+    from .contracts.i_config import iConfig
+except ImportError:
+    import sys
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, current_dir)
+    from contracts.i_config import iConfig
 
-class AppConfig(IConfig):
-    DEFAULT_COLOR: Final[str] = "#000000"
-    DEFAULT_FONT_NAME: Final[str] = "default"
-    DEFAULT_FONT_SIZE: Final[int] = 12
-    DEFAULT_SIZE: Final[Tuple[int, int]] = (400, 400)
-    DEFAULT_SIZE_WINDOW: Final[Dict[str, Tuple[int, int]]] = {
-            'small': (300, 300),
-            'medium': (400, 400),
-            'large': (800, 800)
-        }
-    MIN_SIZE: Final[Tuple[int, int]] = (300, 300)
-
+class AppConfig(iConfig):
     def __init__(self, theme: str = "light"):
-        self._theme = theme
-        self.colors = self._load_colors(theme)
-        self.fonts = self._load_fonts()
-        self.APP_NAME: Final[str] = "Typing Speed Test"
+        self.theme = theme
+        self._settings = self._load_default_settings()
+        self.load_config()
 
-    def _load_colors(self, theme: str) -> Dict[str, str]:
-        if theme == "dark":
-            return {
-                'primary': '#2E3440',
-                'secondary': '#3B4252',
-                'accent': '#5E81AC',
-                'background': '#2E3440',
-                'surface': '#3B4252',
-                'text': '#ECEFF4',
-                'text_secondary': '#D8DEE9',
-                'success': '#A3BE8C',
-                'warning': '#EBCB8B',
-                'error': '#BF616A'
-            }
-        else:  # light
-            return {
-                'primary': '#ECEFF4',
-                'secondary': '#D8DEE9',
-                'accent': '#5E81AC',
-                'background': '#FFFFFF',
-                'surface': '#F8F9FA',
-                'text': '#2E3440',
-                'text_secondary': '#4C566A',
-                'success': '#A3BE8C',
-                'warning': '#EBCB8B',
-                'error': '#BF616A'
-            }
+        if theme:
+            self._theme = theme
 
-    def _load_fonts(self) -> Dict[str, Tuple]:
+    def _load_default_settings(self) -> Dict[str, Any]:
+        """Load default application settings"""
         return {
-            'default': ("Segoe UI", 12),
-            'heading': ("Segoe UI", 20, "bold"),
-            'subheading': ("Segoe UI", 16, "bold"),
-            'body': ("Segoe UI", 12),
-            'caption': ("Segoe UI", 10, "italic")
+            "app_name": "Typing Speed Test",
+            "Version": "1.0.0",
+            "window":{
+                "defult_size": [900,700],
+                "min_size": [800,600],
+                "resizeble": True,
+            },
+            "Themes": {
+                "dark": {
+                    "background": "#2b2b2b",
+                    "surface": "#3c3c3c", 
+                    "primary": "#4a9eff",
+                    "secondary": "#6c757d",
+                    "text": "#ffffff",
+                    "text_secondary": "#cccccc",
+                    "accent": "#17a2b8",
+                    "success": "#28a745",
+                    "warning": "#ffc107",
+                    "error": "#dc3545",
+                    "input_bg": "#404040",
+                    "input_fg": "#ffffff",
+                    "display_bg": "#363636",
+                    "display_fg": "#e0e0e0",
+                    "button_bg": "#4a9eff",
+                    "button_fg": "#ffffff",
+                    "button_hover": "#3a8eef"
+                },
+                "light": {
+                    "background": "#ffffff",
+                    "surface": "#f8f9fa",
+                    "primary": "#007bff",
+                    "secondary": "#6c757d", 
+                    "text": "#212529",
+                    "text_secondary": "#6c757d",
+                    "accent": "#17a2b8",
+                    "success": "#28a745",
+                    "warning": "#ffc107",
+                    "error": "#dc3545",
+                    "input_bg": "#ffffff",
+                    "input_fg": "#212529",
+                    "display_bg": "#f8f9fa",
+                    "display_fg": "#212529",
+                    "button_bg": "#007bff",
+                    "button_fg": "#ffffff",
+                    "button_hover": "#0056b3"
+                }
+            },
+            "fonts": {
+                 "default": ("Arial", 12),
+                "heading": ("Arial", 16, "bold"),
+                "monospace": ("Courier New", 12),
+                "large": ("Arial", 14),
+                "small": ("Arial", 10)
+            },
+            "typing": {
+                "default_duration": 60,
+                "auto_start": False,
+                "show_errors": True,
+                "highlight_errors": True,
+                "sound_enabled": False
+            }
         }
+    
+    @property
+    def APP_NAME(self) -> str:
+        """Get application name"""
+        return self._settings["app_name"]
+    
+    @property
+    def VERSION(self) -> str:
+        """Get application version"""
+        return self._settings["Version"]
+    
+    @property
+    def DEFAULT_SIZE(self) -> tuple:
+        """Get default window size"""
+        size = self._settings["window"]["defult_size"]
+        return (size[0], size[1])
+    
+    @property
+    def MIN_SIZE(self) -> tuple:
+        """Get minimum window size"""
+        size = self._settings["window"]["min_size"]
+        return (size[0], size[1])
+    
+    def get_theme(self) -> str:
+        """Get current theme name
+        
+        Return:
+            str: Current theme(dark/light)
+        """
+        return self._theme
+    
+    def set_theme(self, theme:str) -> None:
+        """
+        Set application theme
+        
+        Args:
+            theme: Theme name (dark/light)
+        """
 
-    def get_color(self, name: str) -> str:
-        return self.colors.get(name, self.DEFAULT_COLOR)
+        if theme in self._settings["themes"]:
+            self._theme = theme
+            self.save_config()
 
-    def get_font(self, name: str) -> Tuple:
-        return self.fonts.get(name, self.fonts["default"])
+    def get_available_themes(self) -> list:
+        """
+        Get list of available themes
+        
+        Returns:
+            list: Available theme names
+        """
 
-    def switch_theme(self, theme_name: str) -> None:
-        self._theme = theme_name
-        self.colors = self._load_colors(theme_name)
+        return list(self._settings["themes"].keys())
+    
+    def get_color(self, element: str) -> str:
+        """
+        Get color for UI element in current theme
 
-    def get_size_window(self, name: str) -> tuple[int, int]:
-        return self.DEFAULT_SIZE_WINDOW.get(name, self.DEFAULT_SIZE)
+        Args:
+            element: UI element name (background, text, primmary, etc.)
+
+        Returns:
+            str: Hex color code
+        """
+
+        theme_colors = self._settings["theme"].get(self._theme, {})
+        return theme_colors.get(element, "#000000")
