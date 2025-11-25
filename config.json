@@ -1,0 +1,88 @@
+{
+  "theme": "dark",
+  "settings": {
+    "app_name": "Typing Speed Test",
+    "version": "1.0.0",
+    "window": {
+      "default_size": [
+        900,
+        700
+      ],
+      "min_size": [
+        800,
+        600
+      ],
+      "resizable": true
+    },
+    "Themes": {
+      "dark": {
+        "background": "#2b2b2b",
+        "surface": "#3c3c3c",
+        "primary": "#4a9eff",
+        "secondary": "#6c757d",
+        "text": "#ffffff",
+        "text_secondary": "#cccccc",
+        "accent": "#17a2b8",
+        "success": "#28a745",
+        "warning": "#ffc107",
+        "error": "#dc3545",
+        "input_bg": "#404040",
+        "input_fg": "#ffffff",
+        "display_bg": "#363636",
+        "display_fg": "#e0e0e0",
+        "button_bg": "#4a9eff",
+        "button_fg": "#ffffff",
+        "button_hover": "#3a8eef"
+      },
+      "light": {
+        "background": "#ffffff",
+        "surface": "#f8f9fa",
+        "primary": "#007bff",
+        "secondary": "#6c757d",
+        "text": "#212529",
+        "text_secondary": "#6c757d",
+        "accent": "#17a2b8",
+        "success": "#28a745",
+        "warning": "#ffc107",
+        "error": "#dc3545",
+        "input_bg": "#ffffff",
+        "input_fg": "#212529",
+        "display_bg": "#f8f9fa",
+        "display_fg": "#212529",
+        "button_bg": "#007bff",
+        "button_fg": "#ffffff",
+        "button_hover": "#0056b3"
+      }
+    },
+    "fonts": {
+      "default": [
+        "Arial",
+        12
+      ],
+      "heading": [
+        "Arial",
+        16,
+        "bold"
+      ],
+      "monospace": [
+        "Courier New",
+        12
+      ],
+      "large": [
+        "Arial",
+        14
+      ],
+      "small": [
+        "Arial",
+        10
+      ]
+    },
+    "typing": {
+      "default_duration": 60,
+      "auto_start": false,
+      "show_errors": true,
+      "highlight_errors": true,
+      "sound_enabled": false
+    }
+  }
+}
