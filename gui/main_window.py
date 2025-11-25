@@ -107,4 +107,64 @@ class BaseWindow(tk.Tk, iMainWindow):
         self.dependencies = dependencies or {}
 
         # Set window properties
-        self.geometry(f'{self.app_config.DEFAULT_SIZE_WINDOW("large")[0]}x{self.app_config.DEFAULT_SIZE_WINDOW("large")[1]}')
+        self.geometry(f'{self.app_config.DEFAULT_SIZE[0]}x{self.app_config.DEFAULT_SIZE[1]}')
+        self.minsize(self.app_config.MIN_SIZE[0], self.app_config.MIN_SIZE[1])
+        self.title(self.app_config.APP_NAME)
+
+        # Set menu bar
+        if menu_bar:
+            self.menu_bar = menu_bar
+        else:
+            menu_callbacks = {
+                'new_file': self.dependencies.get('new_file_handler'),
+                'load_file': self.dependencies.get('load_file_handler'),
+                'save_file': self.dependencies.get('save_file_handler'),
+                'export_config': self.dependencies.get('export_config_handler'),
+                'exit_app': self.dependencies.get('exit_app_handler'),
+                'open_settings': self.dependencies.get('open_settings_handler'),
+                'change_theme': self.dependencies.get('change_theme_handler'),
+                'change_difficulty': self.dependencies.get('change_difficulty_handler'),
+                'show_instructions': self.dependencies.get('show_instructions_handler'),
+                'show_statistics': self.dependencies.get('show_statistics_handler'),
+                'show_about': self.dependencies.get('show_about_handler')
+            }
+            self.menu_bar = MenuBar(self, callbacks=menu_callbacks)
+
+        # attach the menu bar to the window
+        self.config(menu=self.menu_bar)
+
+        # Setup keyboard shortcuts
+        self.bind_all("<Control-n>", lambda event: self.dependencies.get('new_file_handler', lambda: None)())
+        self.bind_all("<Control-o>", lambda event: self.dependencies.get('load_file_handler', lambda: None)())
+        self.bind_all("<Control-s>", lambda event: self.dependencies.get('save_file_handler', lambda: None)())
+        self.bind_all("<Control-q>", lambda event: self.dependencies.get('exit_app_handler', self.quit)())
+        self.bind_all("<F1>", lambda event: self.dependencies.get('show_instructions_handler', lambda: None)())
+    
+class MainWindow(BaseWindow, iMainWindow):
+    def __init__(self, config: AppConfig = None, menu_bar: MenuBar = None,
+                 calculator: Calculator= None, text_manager: TextManager= None, timer: Timer=None):
+        
+        # Create dependencies dictionary
+        dependencies = {
+            "new_file_handler": self.handle_new_test,
+            "load_file_handler": self.handle_load_text,
+            "save_file_handler": self.handle_save_results,
+            "export_config_handler": self.handle_export_config,
+            "exit_app_handler": self.handle_exit_app,
+            "open_settings_handler": self.handle_open_settings,
+            "change_theme_handler": self.handle_change_theme,
+            "change_difficulty_handler": self.handle_change_difficulty,
+            "show_instructions_handler": self.handle_show_instructions,
+            "show_statistics_handler": self.handle_show_statistics,
+            "show_about_handler": self.handle_show_about,
+        }
+        
+        # Initialize base window
+        super().__init__(config, menu_bar, dependencies=dependencies)
+
+        # inject core services
+        self.calculator = calculator or Calculator()
+        self.timer = timer or Timer()
+        self.text_manager = text_manager or TextManager()
+
+        
